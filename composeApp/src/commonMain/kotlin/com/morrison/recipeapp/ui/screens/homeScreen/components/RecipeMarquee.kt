@@ -2,11 +2,13 @@ package com.morrison.recipeapp.ui.screens.homeScreen.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,30 +31,34 @@ import com.morrison.recipeapp.domain.models.Recipe
 @Composable
 fun RecipeMarquee(
     item: Recipe,
-    onClick: () -> Unit
+    onClick:  () -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
+            .padding(vertical = 8.dp)
             .fillMaxWidth()
-            .background(colors.surface)
             .clip(RoundedCornerShape(25.dp))
-            .padding(15.dp)
+            .background(colors.surface)
+            .padding(8.dp)
             .clickable{
                 onClick
             },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         AsyncImage(
             model = item.imageUrl,
             contentDescription = item.title,
             modifier = Modifier
-                .size(35.dp)
+                .size(65.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
 
-        Column {
+        Column(Modifier
+            .width(200.dp)
+        ) {
             Text(
                 text = item.title,
                 fontWeight = FontWeight.Bold,
@@ -71,7 +77,6 @@ fun RecipeMarquee(
             imageVector = Icons.Default.Schedule,
             contentDescription = null,
             modifier = Modifier
-                .padding(horizontal = 8.dp)
                 .size(15.dp)
                 .clip(CircleShape),
             tint = colors.primary

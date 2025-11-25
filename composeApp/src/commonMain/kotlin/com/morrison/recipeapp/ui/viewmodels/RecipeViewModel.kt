@@ -37,6 +37,7 @@ class RecipeViewModel: ViewModel() {
     fun generateRecipe(prompt: Prompt){
         viewModelScope.launch {
             try {
+                isLoading = true
                 val result = recipeService.generateRecipe(prompt)
                 showSheet = true
                 generatedRecipe = result

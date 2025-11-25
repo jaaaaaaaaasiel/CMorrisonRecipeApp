@@ -1,6 +1,7 @@
 package com.morrison.recipeapp.ui.screens.homeScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,13 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -45,9 +49,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.morrison.recipeapp.domain.dtos.Prompt
-import com.morrison.recipeapp.domain.dtos.RecipeDTO
 import com.morrison.recipeapp.domain.utils.HideKeyboard
 import com.morrison.recipeapp.domain.utils.Preferences
+import com.morrison.recipeapp.domain.utils.toRecipeDTO
 import com.morrison.recipeapp.ui.RecipeAppTheme
 import com.morrison.recipeapp.ui.components.CustomTextField
 import com.morrison.recipeapp.ui.components.LoadingOverlay
@@ -70,7 +74,8 @@ fun HomeScreen(nav: NavController){
         skipPartiallyExpanded = false
     )
     val scope = rememberCoroutineScope()
-    var prompt by remember { mutableStateOf("") }
+    var textfield by remember { mutableStateOf("") }
+    var prompt by remember {  mutableStateOf<List<String>>(mutableListOf())}
     val focusManager = LocalFocusManager.current
     val viewModel: RecipeViewModel = viewModel()
 
@@ -104,16 +109,18 @@ fun HomeScreen(nav: NavController){
 
             CustomTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = prompt,
-                onValueChange = { prompt = it},
+                value = textfield,
+                onValueChange = { textfield = it },
                 icon = Icons.Default.AutoAwesome,
                 placeholder = "Escribe tus ingredientes aquí...",
                 onTrailingIconClick = {
                     HideKeyboard(focusManager = focusManager)
-                    viewModel.generateRecipe(Prompt(ingredients = prompt))
+                    prompt = prompt.plus(textfield)
+                    viewModel.generateRecipe(Prompt(ingredients = prompt.toString()))
                     scope.launch {
                         sheetState.partialExpand()
                     }
+                    prompt = emptyList()
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -122,7 +129,7 @@ fun HomeScreen(nav: NavController){
                 keyboardActions = KeyboardActions(
                     onSend = {
                         HideKeyboard(focusManager = focusManager)
-                        viewModel.generateRecipe(Prompt(ingredients = prompt))
+                        viewModel.generateRecipe(Prompt(ingredients = prompt.toString()))
                         scope.launch {
                             sheetState.partialExpand()
                         }
@@ -153,18 +160,7 @@ fun HomeScreen(nav: NavController){
 
                     RecipeCard(recipe){
                         scope.launch {
-                            val recipeDTO = RecipeDTO(
-                                category = recipe.category,
-                                ingredients = recipe.ingredients,
-                                instructions = recipe.instructions,
-                                minutes = recipe.minutes,
-                                stars = recipe.stars,
-                                title = recipe.title,
-                                imageUrl = recipe.imageUrl ?: "",
-                                prompt = ""
-
-                            )
-                            viewModel.showModalFromList(recipeDTO)
+                            viewModel.showModalFromList(toRecipeDTO(recipe))
                             sheetState.partialExpand()
                         }
                     }
@@ -176,13 +172,35 @@ fun HomeScreen(nav: NavController){
         item {
             Spacer(Modifier.height(10.dp))
             val tags = listOf("Quick (10 min)", "Low Calories", "Breakfast", "Ovenless")
-            Text(text = "Quick Ideas... ",
-                modifier = Modifier.padding(bottom = 5.dp))
+            var selectedTag by remember { mutableStateOf<String?>(null) }
+            Text(
+                text = "Quick Ideas... ",
+                modifier = Modifier.padding(bottom = 5.dp),
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
+            )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 items(tags){ tag ->
-                    Tag(tag, true)
+                    val isSelected = selectedTag == tag
+                    Tag(
+                        text = tag,
+                        isBold = true,
+                        mod = Modifier.border(
+                            width = if (isSelected) 3.dp else 0.dp,
+                            color = if (isSelected) colors.primary else Color.Transparent,
+                            shape = CircleShape
+                        )
+                    ){
+                        if (isSelected){
+                            selectedTag = null
+                            prompt = prompt.minus(tag)
+                        } else {
+                            selectedTag = tag
+                            prompt = prompt.plus(tag)
+                        }
+                    }
                 }
             }
 
@@ -195,7 +213,12 @@ fun HomeScreen(nav: NavController){
                     .background(colors.primary.copy(alpha = 0.1f))
                     .padding(all = 20.dp)
                     .clickable{
-                        //Generar receta aleatoria
+                        prompt = emptyList()
+                        val random = prompt.plus("Sorpresa")
+                        viewModel.generateRecipe(Prompt(ingredients = random.toString()))
+                        scope.launch {
+                            sheetState.partialExpand()
+                        }
                     },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -230,7 +253,10 @@ fun HomeScreen(nav: NavController){
 
         items(viewModel.fullRecipes) { recipe ->
             RecipeMarquee(item = recipe){
-
+                scope.launch {
+                    viewModel.showModalFromList(toRecipeDTO(recipe))
+                    sheetState.partialExpand()
+                }
             }
         }
 
@@ -244,12 +270,15 @@ fun HomeScreen(nav: NavController){
             sheetState = sheetState,
         ){
 
-            GeneratedRecipe(recipe = viewModel.generatedRecipe)
+            GeneratedRecipe(recipe = viewModel.generatedRecipe, viewModel.isSaved)
         }
     }
 
     if (viewModel.isLoading){
-        LoadingOverlay("Let me cook!")
+        LoadingOverlay(
+            text = "Let me cook!",
+            icon = Icons.Default.Restaurant
+        )
     }
 }
 

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,8 +23,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.morrison.recipeapp.ui.RecipeAppTheme
+import com.morrison.recipeapp.ui.components.LoadingOverlay
 import com.morrison.recipeapp.ui.screens.LogInScreenRoute
-import com.morrison.recipeapp.ui.screens.MainScreenRoute
 import com.morrison.recipeapp.ui.screens.RegisteScreenRoute
 import com.morrison.recipeapp.ui.screens.auth.components.AuthCard
 import com.morrison.recipeapp.ui.screens.auth.components.Background
@@ -40,6 +42,13 @@ fun RegisterScreen(nav: NavController){
             }
         }
     )
+
+    if (viewModel.isLoading) {
+        LoadingOverlay(
+            text = "Cargando...",
+            icon = Icons.AutoMirrored.Filled.Login
+        )
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()

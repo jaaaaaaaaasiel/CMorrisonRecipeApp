@@ -14,18 +14,18 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Tag(text: String,
-        isBold: Boolean = false
+        mod: Modifier,
+        isBold: Boolean = false,
+        onClick: () -> Unit
 ){
     val colors = MaterialTheme.colorScheme
     Text(
         text = text,
-        modifier = Modifier
+        modifier = mod
             .clip(CircleShape)
             .background(colors.primary.copy(alpha = 0.1f))
             .padding(vertical = 10.dp, horizontal = 20.dp)
-            .clickable{
-
-            },
+            .clickable{ onClick },
         color = colors.primary,
         fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
     )

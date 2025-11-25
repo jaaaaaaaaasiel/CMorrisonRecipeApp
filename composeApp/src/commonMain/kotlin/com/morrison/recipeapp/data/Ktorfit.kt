@@ -29,9 +29,9 @@ object KtorfitClient{
         }
 
         install(HttpTimeout){
-            requestTimeoutMillis = 40000
-            socketTimeoutMillis = 40000
-            connectTimeoutMillis = 40000
+            requestTimeoutMillis = 60000
+            socketTimeoutMillis = 60000
+            connectTimeoutMillis = 60000
         }
 
         defaultRequest {

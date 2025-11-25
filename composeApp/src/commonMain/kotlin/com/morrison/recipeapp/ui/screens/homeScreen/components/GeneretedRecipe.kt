@@ -35,7 +35,10 @@ import com.morrison.recipeapp.ui.RecipeAppTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun GeneratedRecipe(recipe: RecipeDTO?, isSaved: Boolean = false){
+fun GeneratedRecipe(
+    recipe: RecipeDTO?,
+    isSaved: Boolean
+){
     val colors = MaterialTheme.colorScheme
 
     Column(modifier = Modifier
@@ -107,7 +110,11 @@ fun GeneratedRecipe(recipe: RecipeDTO?, isSaved: Boolean = false){
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ){
             recipe?.ingredients?.forEach { ingredient ->
-                Tag(ingredient)
+                Tag(
+                    text = ingredient,
+                    mod = Modifier,
+                    onClick = { }
+                )
             }
         }
         Spacer(Modifier.height(10.dp))
@@ -134,6 +141,7 @@ fun GeneratedRecipe(recipe: RecipeDTO?, isSaved: Boolean = false){
             text = if(isSaved) "Guardar" else "Cerrar",
             modifier = Modifier
                 .align(Alignment.End)
+
                 .clickable{
 
                 }
@@ -180,6 +188,6 @@ fun Preview(){
         prompt = ""
     )
     RecipeAppTheme {
-        GeneratedRecipe(recipe)
+        GeneratedRecipe(recipe, false)
     }
 }

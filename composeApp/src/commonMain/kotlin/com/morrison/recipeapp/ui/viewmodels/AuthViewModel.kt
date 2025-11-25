@@ -2,7 +2,6 @@ package com.morrison.recipeapp.ui.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +18,7 @@ class AuthViewModel : ViewModel() {
     var isLogged = Preferences.getIsLogged()
     var name by  mutableStateOf("")
     var confirmPassword by mutableStateOf("")
+    var isLoading by mutableStateOf(false)
 
     fun register(
         name:String,
@@ -28,6 +28,7 @@ class AuthViewModel : ViewModel() {
     ){
         viewModelScope.launch {
             try{
+                isLoading = true
                 val service = KtorfitClient.createAuthService()
                 val register = Register(
                     name = name,
@@ -53,6 +54,8 @@ class AuthViewModel : ViewModel() {
             catch (e: Exception){
                 onResult(false,"Error al registrar")
                 print(e.toString())
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -64,6 +67,7 @@ class AuthViewModel : ViewModel() {
     ){
         viewModelScope.launch {
             try{
+                isLoading = true
                 val service = KtorfitClient.createAuthService()
                 val login = Login(
                     email = email,
@@ -82,6 +86,8 @@ class AuthViewModel : ViewModel() {
             catch (e: Exception){
                 onResult(false,"Error al loguearse")
                 println(e.toString())
+            } finally {
+                isLoading = false
             }
         }
     }
