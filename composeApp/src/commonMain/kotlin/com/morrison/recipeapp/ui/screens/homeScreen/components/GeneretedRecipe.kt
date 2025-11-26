@@ -37,7 +37,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun GeneratedRecipe(
     recipe: RecipeDTO?,
-    isSaved: Boolean
+    isSaved: Boolean,
+    onButton: () -> Unit
 ){
     val colors = MaterialTheme.colorScheme
 
@@ -136,16 +137,19 @@ fun GeneratedRecipe(
                 )
             }
         }
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp))
+
         Text(
             text = if(isSaved) "Guardar" else "Cerrar",
             modifier = Modifier
+                .padding(end = 10.dp)
                 .align(Alignment.End)
-
-                .clickable{
-
-                }
-
+                .clip(CircleShape)
+                .background(colors.primary.copy(alpha = 0.1f))
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+                .clickable{ onButton },
+            color = colors.primary,
+            fontWeight = FontWeight.Bold
         )
 
     }
@@ -188,6 +192,6 @@ fun Preview(){
         prompt = ""
     )
     RecipeAppTheme {
-        GeneratedRecipe(recipe, false)
+        GeneratedRecipe(recipe, false, onButton = {})
     }
 }

@@ -45,6 +45,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -65,6 +68,7 @@ import com.morrison.recipeapp.ui.screens.homeScreen.components.Tag
 import com.morrison.recipeapp.ui.viewmodels.RecipeViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.reflect.KClass
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +81,13 @@ fun HomeScreen(nav: NavController){
     var textfield by remember { mutableStateOf("") }
     var prompt by remember {  mutableStateOf<List<String>>(mutableListOf())}
     val focusManager = LocalFocusManager.current
-    val viewModel: RecipeViewModel = viewModel()
+    val viewModel: RecipeViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
+                return RecipeViewModel() as T
+            }
+        }
+    )
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
@@ -120,6 +130,7 @@ fun HomeScreen(nav: NavController){
                     scope.launch {
                         sheetState.partialExpand()
                     }
+                    println(prompt.toString())
                     prompt = emptyList()
                 },
                 keyboardOptions = KeyboardOptions(
@@ -183,7 +194,7 @@ fun HomeScreen(nav: NavController){
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 items(tags){ tag ->
-                    val isSelected = selectedTag == tag
+                    val isSelected = (selectedTag == tag)
                     Tag(
                         text = tag,
                         isBold = true,
@@ -270,7 +281,24 @@ fun HomeScreen(nav: NavController){
             sheetState = sheetState,
         ){
 
-            GeneratedRecipe(recipe = viewModel.generatedRecipe, viewModel.isSaved)
+            GeneratedRecipe(
+                recipe = viewModel.generatedRecipe,
+                isSaved =  viewModel.isSaved,
+                onButton = {
+                    if (viewModel.isSaved){
+                        scope.launch {
+                            viewModel.hideModal()
+                            sheetState.hide()
+                        }
+                        viewModel.saveRecipe()
+
+                    } else {
+                        scope.launch {
+                            viewModel.hideModal()
+                            sheetState.hide()
+                        }                    }
+                }
+            )
         }
     }
 

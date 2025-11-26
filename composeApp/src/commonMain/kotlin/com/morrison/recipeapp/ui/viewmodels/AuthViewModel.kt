@@ -15,7 +15,7 @@ class AuthViewModel : ViewModel() {
 
     var email by mutableStateOf("")
     var  password by  mutableStateOf("")
-    var isLogged = Preferences.getIsLogged()
+    var isLogged by mutableStateOf(Preferences.getIsLogged())
     var name by  mutableStateOf("")
     var confirmPassword by mutableStateOf("")
     var isLoading by mutableStateOf(false)
@@ -52,7 +52,7 @@ class AuthViewModel : ViewModel() {
                 }
             }
             catch (e: Exception){
-                onResult(false,"Error al registrar")
+                onResult(false,e.toString())
                 print(e.toString())
             } finally {
                 isLoading = false

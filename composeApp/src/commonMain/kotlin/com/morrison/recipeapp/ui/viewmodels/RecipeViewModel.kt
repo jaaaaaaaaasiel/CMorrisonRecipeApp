@@ -9,10 +9,11 @@ import com.morrison.recipeapp.data.KtorfitClient
 import com.morrison.recipeapp.domain.dtos.Prompt
 import com.morrison.recipeapp.domain.dtos.RecipeDTO
 import com.morrison.recipeapp.domain.models.Recipe
+import com.morrison.recipeapp.domain.utils.Preferences
 import kotlinx.coroutines.launch
 
 class RecipeViewModel: ViewModel() {
-    val userId = 2
+    val userId = Preferences.getUserId()
 
     val recipeService = KtorfitClient.createRecipeService()
     var recipes by mutableStateOf<List<Recipe>>(listOf())
@@ -44,6 +45,7 @@ class RecipeViewModel: ViewModel() {
                 println(result.toString())
             } catch (e: Error){
                 showSheet = false
+                println("Error de a debis:$")
                 println(e.toString())
             } finally {
                 isLoading = false

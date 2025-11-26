@@ -93,7 +93,7 @@ fun RegisterScreen(nav: NavController){
                     email = viewModel.email,
                     password = viewModel.password
                 ) { success, message ->
-                    if(success) {
+                    if (success) {
                         nav.navigate(LogInScreenRoute) {
                             popUpTo(RegisteScreenRoute) {
                                 inclusive = true
