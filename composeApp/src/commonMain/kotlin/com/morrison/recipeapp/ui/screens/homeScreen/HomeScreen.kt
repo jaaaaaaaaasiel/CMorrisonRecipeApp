@@ -72,14 +72,14 @@ import kotlin.reflect.KClass
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(nav: NavController){
+fun HomeScreen(nav: NavController) {
     val colors = MaterialTheme.colorScheme
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
     )
     val scope = rememberCoroutineScope()
     var textfield by remember { mutableStateOf("") }
-    var prompt by remember {  mutableStateOf("")}
+    var prompt by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val viewModel: RecipeViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -89,25 +89,26 @@ fun HomeScreen(nav: NavController){
         }
     )
 
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .background(colors.background)
-        .safeContentPadding()
-    ){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            .safeContentPadding()
+    ) {
         //Header
         item {
-             Header{
-                 Preferences.clearSettings()
-                 nav.navigate(LogInScreenRoute){
+            Header {
+                Preferences.clearSettings()
+                nav.navigate(LogInScreenRoute) {
                     popUpTo(HomeScreenRoute) { inclusive = true }
-                 }
-             }
+                }
+            }
         }
 
         // Text Field
-        item{
+        item {
             Text(
-                text= "Crea, cocina, comparte y disfruta",
+                text = "Crea, cocina, comparte y disfruta",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.ExtraBold
                 ),
@@ -148,7 +149,7 @@ fun HomeScreen(nav: NavController){
         }
 
         // Last Recipes
-        item{
+        item {
             Spacer(Modifier.height(10.dp))
 
             Text(
@@ -161,14 +162,16 @@ fun HomeScreen(nav: NavController){
             )
             Spacer(Modifier.height(10.dp))
 
-            LazyRow(modifier = Modifier
-                .fillMaxWidth(),
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(viewModel.recipes){ recipe ->
+                items(viewModel.recipes) { recipe ->
 
-                    RecipeCard(recipe){
+                    RecipeCard(recipe) {
                         scope.launch {
+                            viewModel.isSaved = true
                             viewModel.showModalFromList(toRecipeDTO(recipe))
                             sheetState.partialExpand()
                         }
@@ -190,8 +193,8 @@ fun HomeScreen(nav: NavController){
             )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                items(tags){ tag ->
+            ) {
+                items(tags) { tag ->
                     val isSelected = (selectedTag == tag)
                     Tag(
                         text = tag,
@@ -201,8 +204,8 @@ fun HomeScreen(nav: NavController){
                             color = if (isSelected) colors.primary else Color.Transparent,
                             shape = CircleShape
                         )
-                    ){
-                        if (isSelected){
+                    ) {
+                        if (isSelected) {
                             selectedTag = null
                             prompt = tag
                         } else {
@@ -221,7 +224,7 @@ fun HomeScreen(nav: NavController){
                     .clip(RoundedCornerShape(16.dp))
                     .background(colors.primary.copy(alpha = 0.1f))
                     .padding(all = 20.dp)
-                    .clickable{
+                    .clickable {
                         prompt = "Sorpresa"
                         viewModel.generateRecipe(Prompt(ingredients = prompt))
                         scope.launch {
@@ -260,7 +263,7 @@ fun HomeScreen(nav: NavController){
         }
 
         items(viewModel.fullRecipes) { recipe ->
-            RecipeMarquee(item = recipe){
+            RecipeMarquee(item = recipe) {
                 scope.launch {
                     viewModel.showModalFromList(toRecipeDTO(recipe))
                     sheetState.partialExpand()
@@ -270,19 +273,19 @@ fun HomeScreen(nav: NavController){
 
     }
 
-    if (viewModel.showSheet){
+    if (viewModel.showSheet) {
         ModalBottomSheet(
             onDismissRequest = { viewModel.hideModal() },
             dragHandle = { BottomSheetDefaults.DragHandle() },
             containerColor = colors.surface,
             sheetState = sheetState,
-        ){
+        ) {
 
             GeneratedRecipe(
                 recipe = viewModel.generatedRecipe,
-                isSaved =  viewModel.isSaved,
+                isSaved = viewModel.isSaved,
                 onButton = {
-                    if (viewModel.isSaved){
+                    if (!viewModel.isSaved) {
                         scope.launch {
                             viewModel.hideModal()
                             sheetState.hide()
@@ -293,13 +296,14 @@ fun HomeScreen(nav: NavController){
                         scope.launch {
                             viewModel.hideModal()
                             sheetState.hide()
-                        }                    }
+                        }
+                    }
                 }
             )
         }
     }
 
-    if (viewModel.isLoading){
+    if (viewModel.isLoading) {
         LoadingOverlay(
             text = "Let me cook!",
             icon = Icons.Default.Restaurant
@@ -309,7 +313,7 @@ fun HomeScreen(nav: NavController){
 
 @Preview
 @Composable
-fun HSPreview(){
+fun HSPreview() {
     RecipeAppTheme {
         HomeScreen(rememberNavController())
     }

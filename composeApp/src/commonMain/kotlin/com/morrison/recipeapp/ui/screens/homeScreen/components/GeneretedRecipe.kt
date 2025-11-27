@@ -140,14 +140,14 @@ fun GeneratedRecipe(
         Spacer(Modifier.height(24.dp))
 
         Text(
-            text = if(isSaved) "Guardar" else "Cerrar",
+            text = if(!isSaved) "Guardar" else "Cerrar",
             modifier = Modifier
                 .padding(end = 10.dp)
                 .align(Alignment.End)
                 .clip(CircleShape)
                 .background(colors.primary.copy(alpha = 0.1f))
                 .padding(vertical = 10.dp, horizontal = 20.dp)
-                .clickable{ onButton },
+                .clickable{ onButton() },
             color = colors.primary,
             fontWeight = FontWeight.Bold
         )

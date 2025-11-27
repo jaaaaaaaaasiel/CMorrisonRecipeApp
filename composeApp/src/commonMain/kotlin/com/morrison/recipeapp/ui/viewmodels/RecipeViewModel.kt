@@ -83,6 +83,7 @@ class RecipeViewModel: ViewModel() {
                 )
                 val result = recipeService.saveGeneratedRecipe(recipe = recipe)
                 isSaved = true
+                getRecipes()
                 println(result.toString())
             }catch (e: Exception){
                 println(e.toString())

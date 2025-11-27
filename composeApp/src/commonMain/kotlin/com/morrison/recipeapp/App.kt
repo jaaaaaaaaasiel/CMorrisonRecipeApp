@@ -20,7 +20,7 @@ fun App() {
         val nav = rememberNavController()
         NavHost(
             navController = nav,
-            startDestination = HomeScreenRoute
+            startDestination = LogInScreenRoute
         ) {
             composable<RegisteScreenRoute> {
                 RegisterScreen(nav)
