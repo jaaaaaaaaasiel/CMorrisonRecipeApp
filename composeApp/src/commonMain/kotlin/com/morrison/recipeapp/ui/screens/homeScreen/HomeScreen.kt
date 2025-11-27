@@ -79,7 +79,7 @@ fun HomeScreen(nav: NavController){
     )
     val scope = rememberCoroutineScope()
     var textfield by remember { mutableStateOf("") }
-    var prompt by remember {  mutableStateOf<List<String>>(mutableListOf())}
+    var prompt by remember {  mutableStateOf("")}
     val focusManager = LocalFocusManager.current
     val viewModel: RecipeViewModel = viewModel(
         factory = object : ViewModelProvider.Factory {
@@ -125,13 +125,11 @@ fun HomeScreen(nav: NavController){
                 placeholder = "Escribe tus ingredientes aquí...",
                 onTrailingIconClick = {
                     HideKeyboard(focusManager = focusManager)
-                    prompt = prompt.plus(textfield)
-                    viewModel.generateRecipe(Prompt(ingredients = prompt.toString()))
+                    prompt = textfield
+                    viewModel.generateRecipe(Prompt(ingredients = prompt))
                     scope.launch {
                         sheetState.partialExpand()
                     }
-                    println(prompt.toString())
-                    prompt = emptyList()
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -206,10 +204,10 @@ fun HomeScreen(nav: NavController){
                     ){
                         if (isSelected){
                             selectedTag = null
-                            prompt = prompt.minus(tag)
+                            prompt = tag
                         } else {
                             selectedTag = tag
-                            prompt = prompt.plus(tag)
+                            prompt = tag
                         }
                     }
                 }
@@ -224,9 +222,8 @@ fun HomeScreen(nav: NavController){
                     .background(colors.primary.copy(alpha = 0.1f))
                     .padding(all = 20.dp)
                     .clickable{
-                        prompt = emptyList()
-                        val random = prompt.plus("Sorpresa")
-                        viewModel.generateRecipe(Prompt(ingredients = random.toString()))
+                        prompt = "Sorpresa"
+                        viewModel.generateRecipe(Prompt(ingredients = prompt))
                         scope.launch {
                             sheetState.partialExpand()
                         }
